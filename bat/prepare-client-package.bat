@@ -17,7 +17,7 @@ set "ZIP_NAME=pos-client.zip"
 
 REM Check requirements
 echo Checking requirements...
-composer -V >nul 2>&1
+call composer -V >nul 2>&1
 if %errorlevel% neq 0 (
     echo    [X] Composer not found. Please install Composer.
     pause
@@ -36,7 +36,7 @@ echo.
 echo [1/6] Installing backend dependencies...
 cd backend
 if not exist "vendor" (
-    composer install --no-dev --optimize-autoloader
+    call composer install --no-dev --optimize-autoloader
     if errorlevel 1 (
         echo    [X] Composer install failed
         pause
