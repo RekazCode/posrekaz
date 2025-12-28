@@ -72,10 +72,10 @@ echo.
 
 echo [3/4] Updating PHP packages...
 echo.
-composer -V >nul 2>&1
+call composer -V >nul 2>&1
 if %errorlevel% equ 0 (
     cd backend
-    composer install --no-dev --optimize-autoloader >> "..\%LOG_FILE%" 2>&1
+    call composer install --no-dev --optimize-autoloader >> "..\%LOG_FILE%" 2>&1
     if not errorlevel 1 (
         echo    [OK] Packages updated
     ) else (
