@@ -1,24 +1,34 @@
 @echo off
+chcp 65001 >nul 2>&1
+
 echo.
 echo ========================================================
-echo        Resetting Admin Password
+echo        POS System - Reset Admin Password
 echo ========================================================
 echo.
 
-cd /d "%~dp0\Backend"
+REM Change to backend directory
+cd /d "%~dp0..\backend"
 
-echo Resetting user: admin@example.com
-echo Password: password123
+echo Resetting admin password...
+echo.
+echo    Email: admin@pos.local
+echo    New Password: password
 echo.
 
-php artisan tinker --execute="$u = App\Models\User::where('email', 'admin@example.com')->first(); if(!$u) { $u = new App\Models\User; $u->email = 'admin@example.com'; $u->name = 'Admin User'; } $u->password = bcrypt('password123'); $u->save(); echo 'Done.';"
+php artisan tinker --execute="$u = App\Models\User::where('email', 'admin@pos.local')->first(); if(!$u) { $u = App\Models\User::first(); if(!$u) { echo 'No users found. Run php artisan db:seed first.'; exit; } } $u->password = bcrypt('password'); $u->is_active = true; $u->save(); echo 'Password reset for: ' . $u->email;"
 
 if %errorlevel% equ 0 (
     echo.
     echo    [OK] Password reset successfully!
+    echo.
+    echo    You can now login with:
+    echo      Email: admin@pos.local (or the first user's email)
+    echo      Password: password
 ) else (
     echo.
     echo    [X] Failed to reset password.
+    echo        Make sure the database is set up correctly.
 )
 
 echo.

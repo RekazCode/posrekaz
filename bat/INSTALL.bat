@@ -1,64 +1,103 @@
 @echo off
-title Car Dealership System - Installation
+title POS System - Installation
 cls
+chcp 65001 >nul 2>&1
 
 echo.
 echo ========================================================
-echo        Car Dealership System - Installation
+echo            POS System - Installation
 echo ========================================================
 echo.
 
-REM Change to script directory
-cd /d "%~dp0"
+REM Change to project root directory (parent of bat folder)
+cd /d "%~dp0.."
+set "PROJECT_DIR=%cd%"
 
-echo [1/4] Checking Requirements...
+echo [1/5] Checking Requirements...
 echo.
 
 REM Check PHP
 php -v >nul 2>&1
 if %errorlevel% neq 0 (
-    echo    [X] PHP not found. Please install XAMPP
-    echo.
-    echo Press any key to exit...
-    pause >nul
-    exit /b 1
+    if exist "C:\xampp\php\php.exe" (
+        set "PATH=C:\xampp\php;%PATH%"
+    ) else (
+        echo    [X] PHP not found. Please install XAMPP
+        echo.
+        echo Press any key to exit...
+        pause >nul
+        exit /b 1
+    )
 )
 echo    [OK] PHP found
+
+REM Check Composer
+composer -V >nul 2>&1
+if %errorlevel% neq 0 (
+    echo    [!] Composer not found - will skip dependency installation
+    set "COMPOSER_AVAILABLE=0"
+) else (
+    echo    [OK] Composer found
+    set "COMPOSER_AVAILABLE=1"
+)
 echo.
 
-echo [2/4] Checking installation files...
+echo [2/5] Checking installation files...
 echo.
-if not exist "Backend" (
+if not exist "backend" (
     echo    [X] Backend folder not found!
     echo.
     echo Press any key to exit...
     pause >nul
     exit /b 1
 )
+echo    [OK] Backend folder found
 
-if not exist "Backend\vendor" (
-    echo    [X] Dependencies missing! Package may be corrupted.
-    echo.
-    echo Press any key to exit...
-    pause >nul
-    exit /b 1
+if not exist "frontend" (
+    echo    [!] Frontend folder not found - will use pre-built version
+) else (
+    echo    [OK] Frontend folder found
 )
-echo    [OK] All files present
 echo.
 
-echo [3/4] Setting up environment...
+echo [3/5] Installing dependencies...
 echo.
-cd Backend
+if "%COMPOSER_AVAILABLE%"=="1" (
+    cd backend
+    if not exist "vendor" (
+        echo    Installing PHP dependencies...
+        composer install --no-dev --optimize-autoloader
+        if errorlevel 1 (
+            echo    [!] Composer install had issues, continuing...
+        ) else (
+            echo    [OK] PHP dependencies installed
+        )
+    ) else (
+        echo    [OK] PHP dependencies already installed
+    )
+    cd ..
+) else (
+    if not exist "backend\vendor" (
+        echo    [X] Dependencies missing and Composer not available!
+        echo        Please install Composer or use a pre-packaged version.
+        pause >nul
+        exit /b 1
+    )
+    echo    [OK] Using existing dependencies
+)
+echo.
+
+echo [4/5] Setting up environment...
+echo.
+cd backend
 if not exist ".env" (
     if exist ".env.example" (
         copy ".env.example" ".env" >nul
         echo    [OK] .env file created
         
-        echo    [i] Generating application keys...
-        call php artisan key:generate --force
-        call php artisan jwt:secret --force
-
-        echo    [OK] Environment configured
+        echo    Generating application keys...
+        php artisan key:generate --force >nul 2>&1
+        echo    [OK] Application key generated
     ) else (
         echo    [X] .env.example not found!
         echo.
@@ -68,32 +107,37 @@ if not exist ".env" (
         exit /b 1
     )
 ) else (
-    echo    [i] .env file already exists
-    echo    [i] Checking application keys...
-    call php artisan key:generate
-    call php artisan jwt:secret
+    echo    [OK] .env file already exists
 )
 cd ..
-echo.
 
-REM Create directories
+REM Create required directories
 if not exist "logs" mkdir logs
 if not exist "backups" mkdir backups
+echo    [OK] Directories created
+echo.
 
-echo [4/4] Setting up database...
+echo [5/5] Setting up database...
 echo.
 set /p run_migrate="    Run database setup now? (Y/N): "
 if /i "%run_migrate%"=="Y" (
-    cd Backend
+    cd backend
+    echo    Running migrations...
     php artisan migrate --force
     if %errorlevel% equ 0 (
-        echo    [OK] Database setup complete
-        set /p run_seed="    Add sample data? (Y/N): "
+        echo    [OK] Database tables created
+        echo.
+        set /p run_seed="    Add initial data (admin user, etc.)? (Y/N): "
         if /i "%run_seed%"=="Y" (
             php artisan db:seed
+            echo    [OK] Initial data added
+            echo.
+            echo    Default Admin Login:
+            echo      Email: admin@pos.local
+            echo      Password: password
         )
     ) else (
-        echo    [!] Migration failed - check your database settings
+        echo    [!] Migration failed - check database settings in backend\.env
     )
     cd ..
 ) else (
@@ -102,16 +146,18 @@ if /i "%run_migrate%"=="Y" (
 echo.
 
 echo ========================================================
-echo          Installation Complete!
+echo            Installation Complete!
 echo ========================================================
 echo.
 echo Next steps:
 echo   1. Start MySQL from XAMPP Control Panel
-echo   2. Edit Backend\.env (database settings if needed)
-echo   3. Run: START.bat
+echo   2. Edit backend\.env if needed (database settings)
+echo   3. Run: Run-System.bat
 echo   4. System will open at: http://localhost:8000
 echo.
-echo For updates: Use Settings - System Update button
+echo Default Login:
+echo   Email: admin@pos.local
+echo   Password: password
 echo ========================================================
 echo.
 echo Press any key to exit...
