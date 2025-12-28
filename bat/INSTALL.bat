@@ -41,6 +41,7 @@ if %errorlevel% neq 0 (
     set "COMPOSER_AVAILABLE=1"
 )
 echo.
+pause
 
 echo [2/5] Checking installation files...
 echo.
@@ -59,21 +60,18 @@ if not exist "frontend" (
     echo    [OK] Frontend folder found
 )
 echo.
+pause
 
 echo [3/5] Installing dependencies...
 echo.
 if "%COMPOSER_AVAILABLE%"=="1" (
     cd backend
-    if not exist "vendor" (
-        echo    Installing PHP dependencies...
-        composer install --no-dev --optimize-autoloader
-        if errorlevel 1 (
-            echo    [!] Composer install had issues, continuing...
-        ) else (
-            echo    [OK] PHP dependencies installed
-        )
+    echo    Installing PHP dependencies...
+    call composer install
+    if errorlevel 1 (
+        echo    [!] Composer install had issues, continuing...
     ) else (
-        echo    [OK] PHP dependencies already installed
+        echo    [OK] PHP dependencies installed
     )
     cd ..
 ) else (
@@ -90,6 +88,7 @@ echo.
 echo [4/5] Setting up environment...
 echo.
 cd backend
+pause
 if not exist ".env" (
     if exist ".env.example" (
         copy ".env.example" ".env" >nul
@@ -115,6 +114,7 @@ REM Create required directories
 if not exist "logs" mkdir logs
 if not exist "backups" mkdir backups
 echo    [OK] Directories created
+pause
 echo.
 
 echo [5/5] Setting up database...
@@ -143,6 +143,7 @@ if /i "%run_migrate%"=="Y" (
 ) else (
     echo    [i] Database setup skipped
 )
+pause
 echo.
 
 echo ========================================================
