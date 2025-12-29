@@ -32,11 +32,12 @@ if %errorlevel% neq 0 (
 echo    [OK] PHP found
 
 REM Check Composer
-composer -V >nul 2>&1
+where composer >nul 2>&1
 if %errorlevel% neq 0 (
     echo    [!] Composer not found - will skip dependency installation
     set "COMPOSER_AVAILABLE=0"
 ) else (
+    call composer -V >nul 2>&1
     echo    [OK] Composer found
     set "COMPOSER_AVAILABLE=1"
 )
@@ -121,6 +122,19 @@ echo [5/5] Setting up database...
 echo.
 set /p run_migrate="    Run database setup now? (Y/N): "
 if /i "%run_migrate%"=="Y" (
+    
+    REM Create Database if not exists
+    echo    Creating database if missing...
+    set "MYSQL_CMD=mysql"
+    if exist "C:\xampp\mysql\bin\mysql.exe" set "MYSQL_CMD=C:\xampp\mysql\bin\mysql.exe"
+    
+    "%MYSQL_CMD%" -u root -e "CREATE DATABASE IF NOT EXISTS pos_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo    [!] Could not create database automatically. Please ensure MySQL is running.
+    ) else (
+        echo    [OK] Database checked/created
+    )
+
     cd backend
     echo    Running migrations...
     php artisan migrate --force
