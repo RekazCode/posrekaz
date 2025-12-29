@@ -1,6 +1,7 @@
 /**
  * Dashboard Page - Modern UI/UX Redesign
  * Phase F7: Reports & Analytics
+ * Updated for Client Verification
  */
 
 import { useState, useEffect, useCallback } from 'react';
