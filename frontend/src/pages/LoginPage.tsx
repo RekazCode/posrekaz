@@ -3,11 +3,12 @@ import type { FormEvent } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore, useLocaleStore } from '../stores';
 import { LocaleSwitcher } from '../components';
+import { Store, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, LogIn } from 'lucide-react';
 
 /**
  * Login page with email/password form.
  * RTL-aware, touch-friendly, handles virtual keyboard.
- * Updated: December 2025 - Enhanced UI/UX improvements
+ * Updated: December 2025 - Enhanced UI/UX improvements (Glassmorphism)
  */
 export function LoginPage() {
   const navigate = useNavigate();
@@ -39,44 +40,56 @@ export function LoginPage() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Glass Card */}
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo/Brand Section */}
-        <div style={styles.brandSection}>
-          <div style={styles.logoIcon}>🏪</div>
-          <h1 style={styles.brandTitle}>POS System</h1>
-          <p style={styles.brandSubtitle}>{t('auth.welcome_message', 'Welcome back! Please sign in to continue.')}</p>
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 mb-4 shadow-lg">
+            <Store className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">POS System</h1>
+          <p className="text-slate-400 text-sm">
+            {t('auth.welcome_message', 'Welcome back! Please sign in to continue.')}
+          </p>
         </div>
 
         {/* Header with locale switcher */}
-        <div style={styles.header}>
-          <h2 style={styles.title}>{t('auth.login_title', 'Sign In')}</h2>
-          <LocaleSwitcher />
+        <div className="flex items-center justify-between mb-6 pt-4 border-t border-white/10">
+          <h2 className="text-xl font-semibold text-white">
+            {t('auth.login_title', 'Sign In')}
+          </h2>
+          <div className="scale-90 origin-right">
+            <LocaleSwitcher />
+          </div>
         </div>
 
         {/* Error message */}
         {error && (
-          <div style={styles.error} role="alert">
-            <span style={styles.errorIcon}>⚠️</span>
-            {error}
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-200" role="alert">
+            <AlertCircle className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{error}</span>
           </div>
         )}
 
         {/* Login form */}
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.field}>
-            <label htmlFor="email" style={styles.label}>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-slate-300 block">
               {t('auth.email', 'Email')}
             </label>
-            <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>📧</span>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="w-5 h-5 text-slate-500" />
+              </div>
               <input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`input ${error ? 'input-error' : ''}`}
-                style={styles.inputWithIcon}
+                className={`w-full pl-10 pr-4 py-3 bg-slate-900/50 border rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all ${
+                  error ? 'border-red-500/50' : 'border-slate-700'
+                }`}
                 placeholder={t('auth.email_placeholder', 'you@example.com')}
                 required
                 autoComplete="email"
@@ -86,19 +99,22 @@ export function LoginPage() {
             </div>
           </div>
 
-          <div style={styles.field}>
-            <label htmlFor="password" style={styles.label}>
+          <div className="space-y-2">
+            <label htmlFor="password" className="text-sm font-medium text-slate-300 block">
               {t('auth.password', 'Password')}
             </label>
-            <div style={styles.inputWrapper}>
-              <span style={styles.inputIcon}>🔒</span>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="w-5 h-5 text-slate-500" />
+              </div>
               <input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`input ${error ? 'input-error' : ''}`}
-                style={styles.inputWithIcon}
+                className={`w-full pl-10 pr-12 py-3 bg-slate-900/50 border rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all ${
+                  error ? 'border-red-500/50' : 'border-slate-700'
+                }`}
                 placeholder={t('auth.password_placeholder', '••••••••')}
                 required
                 autoComplete="current-password"
@@ -107,37 +123,36 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={styles.togglePasswordBtn}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
                 tabIndex={-1}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            className="btn btn-primary"
-            style={styles.submitButton}
             disabled={isLoading}
+            className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-[0.98] flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
-                <span className="spinner"></span>
-                {t('auth.signing_in', 'Signing in...')}
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>{t('auth.signing_in', 'Signing in...')}</span>
               </>
             ) : (
               <>
-                <span style={{ marginInlineEnd: '0.5rem' }}>🔐</span>
-                {t('auth.sign_in', 'Sign In')}
+                <LogIn className="w-5 h-5" />
+                <span>{t('auth.sign_in', 'Sign In')}</span>
               </>
             )}
           </button>
         </form>
 
         {/* Footer */}
-        <div style={styles.footer}>
-          <p style={styles.footerText}>
+        <div className="mt-8 pt-6 border-t border-white/10 text-center">
+          <p className="text-xs text-slate-500">
             {t('auth.footer_text', '© 2025 POS System. All rights reserved.')}
           </p>
         </div>
@@ -145,138 +160,5 @@ export function LoginPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1rem',
-    background: 'linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-800) 100%)',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: '1rem',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-    padding: '2.5rem',
-    width: '100%',
-    maxWidth: '26rem',
-  },
-  brandSection: {
-    textAlign: 'center' as const,
-    marginBottom: '1.5rem',
-  },
-  logoIcon: {
-    fontSize: '3rem',
-    marginBottom: '0.5rem',
-  },
-  brandTitle: {
-    fontSize: '1.75rem',
-    fontWeight: 800,
-    color: 'var(--color-primary-600)',
-    margin: '0 0 0.5rem 0',
-  },
-  brandSubtitle: {
-    color: 'var(--color-gray-500)',
-    fontSize: '0.875rem',
-    margin: 0,
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: '1rem',
-    paddingTop: '1rem',
-    borderTop: '1px solid var(--color-gray-200)',
-  },
-  title: {
-    fontSize: '1.25rem',
-    fontWeight: 600,
-    color: 'var(--color-gray-900)',
-    margin: 0,
-  },
-  subtitle: {
-    color: 'var(--color-gray-500)',
-    marginBottom: '1.5rem',
-  },
-  error: {
-    backgroundColor: 'var(--color-error-50)',
-    color: 'var(--color-error-600)',
-    padding: '0.75rem 1rem',
-    borderRadius: '0.5rem',
-    marginBottom: '1rem',
-    fontSize: '0.875rem',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    border: '1px solid var(--color-error-200)',
-  },
-  errorIcon: {
-    fontSize: '1rem',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1.25rem',
-  },
-  field: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.5rem',
-  },
-  label: {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: 'var(--color-gray-700)',
-  },
-  inputWrapper: {
-    position: 'relative' as const,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  inputIcon: {
-    position: 'absolute' as const,
-    insetInlineStart: '0.75rem',
-    fontSize: '1rem',
-    pointerEvents: 'none' as const,
-  },
-  inputWithIcon: {
-    paddingInlineStart: '2.5rem',
-    paddingInlineEnd: '2.5rem',
-    width: '100%',
-  },
-  togglePasswordBtn: {
-    position: 'absolute' as const,
-    insetInlineEnd: '0.75rem',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    padding: '0.25rem',
-    opacity: 0.7,
-  },
-  submitButton: {
-    width: '100%',
-    marginTop: '0.75rem',
-    padding: '0.875rem 1.5rem',
-    fontSize: '1rem',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footer: {
-    marginTop: '2rem',
-    paddingTop: '1rem',
-    borderTop: '1px solid var(--color-gray-200)',
-    textAlign: 'center' as const,
-  },
-  footerText: {
-    color: 'var(--color-gray-400)',
-    fontSize: '0.75rem',
-    margin: 0,
-  },
-};
 
 export default LoginPage;
