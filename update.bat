@@ -80,7 +80,7 @@ if %errorLevel% neq 0 (
 if not exist ".git" (
     echo    Initializing git repository...
     git init 2>>"%LOG_FILE%"
-    git remote add origin https://github.com/AhmedA007/POS.git 2>>"%LOG_FILE%"
+    git remote add origin https://github.com/RekazCode/posrekaz.git 2>>"%LOG_FILE%"
     echo    Git repository initialized >> "%LOG_FILE%"
 )
 
