@@ -153,7 +153,6 @@ export function LoginPage() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-white/10 text-center">
           <p className="text-xs text-slate-500">
-            {t('auth.footer_text', '© 2025 POS System. All rights reserved.')}
           </p>
         </div>
       </div>
