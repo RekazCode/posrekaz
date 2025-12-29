@@ -16,3 +16,7 @@ export { SalesLineChart, SalesPieChart, RevenueBarChart, TrendSparkline } from '
 
 // Offline components
 export { OfflineIndicator, SyncStatusCard } from './offline';
+
+// System components
+export { SystemUpdateCard } from './system';
+export type { VersionInfo, ChangelogEntry, UpdateProgress } from './system';

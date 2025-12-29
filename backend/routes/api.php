@@ -404,14 +404,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('system')->group(function () {
+        // Public system info
         Route::get('/info', [SystemController::class, 'info']);
-        Route::post('/update', [SystemController::class, 'update'])
-            ->middleware('permission:system.manage');
-        Route::get('/update-log', [SystemController::class, 'updateLog'])
-            ->middleware('permission:system.manage');
-        Route::post('/clear-cache', [SystemController::class, 'clearCache'])
-            ->middleware('permission:system.manage');
-        Route::post('/backup', [SystemController::class, 'backup'])
-            ->middleware('permission:system.manage');
+
+        // Protected system management routes
+        Route::middleware('permission:system.manage')->group(function () {
+            // Version & Updates
+            Route::get('/check-updates', [SystemController::class, 'checkForUpdates']);
+            Route::get('/update-progress', [SystemController::class, 'getUpdateProgress']);
+            Route::post('/update', [SystemController::class, 'update']);
+            Route::post('/download-update', [SystemController::class, 'downloadUpdate']);
+            Route::post('/rollback', [SystemController::class, 'rollback']);
+            Route::get('/update-log', [SystemController::class, 'updateLog']);
+
+            // Database & Backups
+            Route::post('/backup', [SystemController::class, 'backup']);
+            Route::get('/backups', [SystemController::class, 'listBackups']);
+            Route::post('/restore', [SystemController::class, 'restore']);
+            Route::post('/migrate', [SystemController::class, 'migrate']);
+
+            // Maintenance
+            Route::post('/clear-cache', [SystemController::class, 'clearCache']);
+            Route::get('/check-requirements', [SystemController::class, 'checkRequirements']);
+        });
     });
 });

@@ -670,6 +670,33 @@ export const customersApi = {
 // System API
 // ============================================
 
+// Types for Update System
+export interface VersionInfo {
+  current_version: string;
+  latest_version: string;
+  is_update_available: boolean;
+  release_date?: string;
+  changelog?: ChangelogEntry[];
+  download_size?: string;
+  requires_migration?: boolean;
+  min_php_version?: string;
+  breaking_changes?: string[];
+}
+
+export interface ChangelogEntry {
+  version: string;
+  date: string;
+  type: 'feature' | 'fix' | 'security' | 'improvement' | 'breaking';
+  description: string;
+}
+
+export interface UpdateProgress {
+  stage: 'idle' | 'checking' | 'downloading' | 'backing_up' | 'installing' | 'migrating' | 'completing' | 'done' | 'error';
+  progress: number;
+  message: string;
+  details?: string;
+}
+
 export const systemApi = {
   info: async (): Promise<{
     php_version: string;
@@ -683,23 +710,83 @@ export const systemApi = {
     return response.data.data;
   },
 
+  /**
+   * Check for available updates from the release server
+   */
+  checkForUpdates: async (): Promise<VersionInfo> => {
+    const response = await api.get<ApiResponse<VersionInfo>>('/system/check-updates');
+    return response.data.data;
+  },
+
+  /**
+   * Get update progress (for polling during update)
+   */
+  getUpdateProgress: async (): Promise<UpdateProgress> => {
+    const response = await api.get<ApiResponse<UpdateProgress>>('/system/update-progress');
+    return response.data.data;
+  },
+
+  /**
+   * Start the update process
+   */
   update: async (): Promise<{ success: boolean; message: string }> => {
     const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/system/update');
     return response.data.data;
   },
 
+  /**
+   * Download update package without installing
+   */
+  downloadUpdate: async (version?: string): Promise<{ success: boolean; message: string; path?: string }> => {
+    const response = await api.post<ApiResponse<{ success: boolean; message: string; path?: string }>>('/system/download-update', { version });
+    return response.data.data;
+  },
+
+  /**
+   * Rollback to previous version
+   */
+  rollback: async (): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/system/rollback');
+    return response.data.data;
+  },
+
+  /**
+   * Get update log
+   */
   updateLog: async (): Promise<{ success: boolean; log: string; file?: string }> => {
     const response = await api.get<ApiResponse<{ success: boolean; log: string; file?: string }>>('/system/update-log');
     return response.data.data;
   },
 
+  /**
+   * Clear application cache
+   */
   clearCache: async (): Promise<{ success: boolean; message: string }> => {
     const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/system/clear-cache');
     return response.data.data;
   },
 
+  /**
+   * Create database backup
+   */
   backup: async (): Promise<{ success: boolean; message: string; output?: string }> => {
     const response = await api.post<ApiResponse<{ success: boolean; message: string; output?: string }>>('/system/backup');
+    return response.data.data;
+  },
+
+  /**
+   * Get list of available backups
+   */
+  listBackups: async (): Promise<{ backups: Array<{ name: string; date: string; size: string }> }> => {
+    const response = await api.get<ApiResponse<{ backups: Array<{ name: string; date: string; size: string }> }>>('/system/backups');
+    return response.data.data;
+  },
+
+  /**
+   * Restore from a specific backup
+   */
+  restoreBackup: async (backupName: string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post<ApiResponse<{ success: boolean; message: string }>>('/system/restore', { backup: backupName });
     return response.data.data;
   },
 };

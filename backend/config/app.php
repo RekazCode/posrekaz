@@ -60,6 +60,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Update Server Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This URL is used to check for system updates. The update server provides
+    | version information, changelogs, and update packages. Set this to your
+    | private release server URL.
+    |
+    */
+
+    'update_server_url' => env('UPDATE_SERVER_URL', ''),
+
+    'license_key' => env('LICENSE_KEY', ''),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

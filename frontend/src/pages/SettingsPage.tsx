@@ -9,9 +9,10 @@ import { usePermissions } from '../hooks';
 import { LoadingSpinner } from '../components/ui';
 import { FormField, FormError } from '../components/forms';
 import { SyncStatusCard } from '../components/offline';
+import { SystemUpdateCard } from '../components/system';
 import { settingsApi, systemApi } from '../lib/apiClient';
 import type { Settings } from '../types';
-import { RefreshCw, Download, Trash2 } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 
 export function SettingsPage() {
   const { t, locale, setLocale } = useLocaleStore();
@@ -23,7 +24,6 @@ export function SettingsPage() {
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Form state
@@ -55,27 +55,6 @@ export function SettingsPage() {
       setError(err instanceof Error ? err.message : t('error.save_failed', 'Failed to save'));
     } finally {
       setIsSaving(false);
-    }
-  };
-
-  // System Update
-  const handleSystemUpdate = async () => {
-    if (!confirm(t('system.update_confirm', 'Are you sure you want to update the system? The application will restart automatically.'))) {
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const result = await systemApi.update();
-      toast.success(result.message);
-      
-      // Wait a bit then show message about restart
-      setTimeout(() => {
-        toast.info(t('system.restarting', 'System is restarting... Please wait 30-60 seconds.'));
-      }, 2000);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('system.update_failed', 'Update failed'));
-      setIsUpdating(false);
     }
   };
 
@@ -342,6 +321,11 @@ export function SettingsPage() {
       {/* Offline & Sync Settings */}
       <SyncStatusCard />
 
+      {/* System Updates - New Enhanced Component */}
+      {canManageSystem && (
+        <SystemUpdateCard onUpdateComplete={() => loadSettings()} />
+      )}
+
       {/* System Management */}
       {canManageSystem && (
         <div className="card">
@@ -350,35 +334,6 @@ export function SettingsPage() {
           </h2>
           
           <div className="space-y-4">
-            {/* System Update */}
-            <div className="flex items-start justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--color-gray-50)' }}>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <RefreshCw className="w-5 h-5" style={{ color: 'var(--color-primary-600)' }} />
-                  <span className="font-medium" style={{ color: 'var(--color-gray-900)' }}>
-                    {t('system.update', 'System Update')}
-                  </span>
-                </div>
-                <p className="text-sm" style={{ color: 'var(--color-gray-500)' }}>
-                  {t('system.update_desc', 'Update the system to the latest version from GitHub')}
-                </p>
-              </div>
-              <button
-                onClick={handleSystemUpdate}
-                disabled={isUpdating}
-                className="btn btn-primary"
-              >
-                {isUpdating ? (
-                  <LoadingSpinner size="sm" />
-                ) : (
-                  <>
-                    <RefreshCw className="w-4 h-4" />
-                    {t('system.update_now', 'Update Now')}
-                  </>
-                )}
-              </button>
-            </div>
-
             {/* Clear Cache */}
             <div className="flex items-start justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--color-gray-50)' }}>
               <div className="flex-1">
