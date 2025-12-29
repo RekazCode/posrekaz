@@ -50,7 +50,10 @@ export function LoginPage() {
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">POS System</h1>
           <p className="text-emerald-400 text-xs font-medium mb-2">
-            v1.0.1 - {t('common.updated', 'Updated')} 2025-12-29
+            v1.0.2 - {t('common.updated', 'Updated')} 2025-12-29
+          </p>
+          <p className="text-yellow-400 text-xs font-medium mb-2">
+            🚀 {t('common.new_features', 'New Features Available!')}
           </p>
           <p className="text-slate-400 text-sm">
             {t('auth.welcome_message', 'Welcome back! Please sign in to continue.')}
