@@ -5,8 +5,10 @@
 
 import { useState, useMemo } from 'react';
 import { useLocaleStore } from '../../stores';
+import { usePermissions } from '../../hooks';
 import { Modal, CurrencyInput, Select } from '../ui';
 import { FormField, FormActions, FormError } from '../forms';
+import { BarcodePrintModal } from './BarcodePrintModal';
 import type { Product, CreateProductData, Category } from '../../types';
 
 interface ProductFormProps {
@@ -55,7 +57,9 @@ export function ProductForm({
   isLoading = false,
 }: ProductFormProps) {
   const { t } = useLocaleStore();
+  const { hasPermission } = usePermissions();
   const isEdit = !!product;
+  const canPrint = hasPermission('products.print');
 
   // Derive initial form data from product
   const initialFormData = useMemo(() => getInitialFormData(product), [product]);
@@ -67,6 +71,7 @@ export function ProductForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lastFormKey, setLastFormKey] = useState(formKey);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
   // Reset form when product/isOpen changes (using ref comparison pattern)
   if (formKey !== lastFormKey) {
@@ -75,6 +80,12 @@ export function ProductForm({
     setErrors({});
     setSubmitError(null);
   }
+
+  // Handle print barcode - Opens browser-based print modal
+  const handlePrintBarcode = () => {
+    if (!product?.barcode || !product?.id) return;
+    setIsPrintModalOpen(true);
+  };
 
   // Validate form
   const validate = (): boolean => {
@@ -151,14 +162,31 @@ export function ProductForm({
             label={t('products.barcode', 'Barcode')}
             htmlFor="barcode"
           >
-            <input
-              id="barcode"
-              type="text"
-              value={formData.barcode || ''}
-              onChange={(e) => setFormData({ ...formData, barcode: e.target.value || null })}
-              className="input"
-              placeholder="123456789012"
-            />
+            <div className="flex gap-2">
+              <input
+                id="barcode"
+                type="text"
+                value={formData.barcode || ''}
+                onChange={(e) => setFormData({ ...formData, barcode: e.target.value || null })}
+                className="input flex-1"
+                placeholder="123456789012"
+              />
+              {/* Print Barcode Button - only show when editing and has barcode */}
+              {isEdit && canPrint && product?.barcode && (
+                <button
+                  type="button"
+                  onClick={handlePrintBarcode}
+                  disabled={!formData.barcode}
+                  className="btn btn-secondary"
+                  style={{ minHeight: '48px', minWidth: '48px' }}
+                  title={t('products.print_barcode', 'Print Barcode')}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                </button>
+              )}
+            </div>
           </FormField>
         </div>
 
@@ -264,6 +292,15 @@ export function ProductForm({
           submitLabel={isEdit ? t('common.update', 'Update') : t('common.create', 'Create')}
         />
       </form>
+
+      {/* Barcode Print Modal - Browser-based printing */}
+      {product && (
+        <BarcodePrintModal
+          isOpen={isPrintModalOpen}
+          onClose={() => setIsPrintModalOpen(false)}
+          product={product}
+        />
+      )}
     </Modal>
   );
 }

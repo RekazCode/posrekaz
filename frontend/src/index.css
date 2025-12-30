@@ -693,3 +693,63 @@ html[dir="rtl"] .animate-slide-out-start {
   content-visibility: auto;
   contain-intrinsic-size: 0 500px;
 }
+
+/* ============================================
+   Print Styles for Barcode Stickers
+   ============================================ */
+@media print {
+  /* Hide everything except print content */
+  body > *:not(.print-content) {
+    display: none !important;
+  }
+  
+  /* Reset body for print */
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Barcode sticker styles */
+  .barcode-sticker {
+    width: 50mm;
+    min-height: 30mm;
+    padding: 2mm;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  .barcode-sticker .product-name {
+    font-size: 9pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2mm;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .barcode-sticker .barcode-image {
+    max-width: 46mm;
+    height: auto;
+  }
+  
+  .barcode-sticker .product-price {
+    font-size: 8pt;
+    margin-top: 1mm;
+    color: #333;
+  }
+  
+  /* Print color accuracy */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}

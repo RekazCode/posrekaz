@@ -13,7 +13,7 @@ import {
   Badge,
   ConfirmDialog,
 } from '../components/ui';
-import { ProductForm, CategoryManager } from '../components/products';
+import { ProductForm, CategoryManager, BarcodePrintModal } from '../components/products';
 import { productsApi, categoriesApi } from '../lib/apiClient';
 import type { Product, Category, CreateProductData, ProductListParams } from '../types';
 import type { Column } from '../components/ui';
@@ -26,6 +26,7 @@ export function ProductsPage() {
   const canCreate = hasPermission('products.create');
   const canEdit = hasPermission('products.update');
   const canDelete = hasPermission('products.delete');
+  const canPrint = hasPermission('products.print');
 
   // State
   const [products, setProducts] = useState<Product[]>([]);
@@ -54,6 +55,7 @@ export function ProductsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [printingProduct, setPrintingProduct] = useState<Product | null>(null);
 
   // Load products
   const loadProducts = useCallback(async () => {
@@ -154,6 +156,15 @@ export function ProductsPage() {
     }
   };
 
+  // Handle print barcode - Opens browser-based print modal
+  const handlePrintBarcode = (product: Product) => {
+    if (!product.barcode) {
+      toast.error(t('products.no_barcode', 'Product does not have a barcode'));
+      return;
+    }
+    setPrintingProduct(product);
+  };
+
   // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat(locale, {
@@ -243,6 +254,28 @@ export function ProductsPage() {
   // Row actions
   const rowActions = (product: Product) => (
     <div className="flex items-center justify-end gap-1">
+      {/* Print Barcode Button - Browser-based printing */}
+      {canPrint && (
+        <button
+          onClick={() => handlePrintBarcode(product)}
+          disabled={!product.barcode}
+          className="btn btn-ghost p-2"
+          style={{ 
+            color: product.barcode ? 'var(--color-primary-600)' : 'var(--color-gray-400)',
+            minHeight: '48px',
+            minWidth: '48px',
+          }}
+          title={product.barcode 
+            ? t('products.print_barcode', 'Print Barcode') 
+            : t('products.no_barcode', 'No barcode assigned')
+          }
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+        </button>
+      )}
+      {/* Edit Button */}
       {canEdit && (
         <button
           onClick={() => {
@@ -250,6 +283,7 @@ export function ProductsPage() {
             setIsFormOpen(true);
           }}
           className="btn btn-ghost p-2"
+          style={{ minHeight: '48px', minWidth: '48px' }}
           title={t('common.edit', 'Edit')}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -257,11 +291,12 @@ export function ProductsPage() {
           </svg>
         </button>
       )}
+      {/* Delete Button */}
       {canDelete && (
         <button
           onClick={() => setDeleteId(product.id)}
           className="btn btn-ghost p-2"
-          style={{ color: 'var(--color-error-600)' }}
+          style={{ color: 'var(--color-error-600)', minHeight: '48px', minWidth: '48px' }}
           title={t('common.delete', 'Delete')}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,7 +413,7 @@ export function ProductsPage() {
           sortKey={sortKey}
           sortDirection={sortDirection}
           onSort={handleSort}
-          rowActions={canEdit || canDelete ? rowActions : undefined}
+          rowActions={canEdit || canDelete || canPrint ? rowActions : undefined}
           pagination={{
             ...pagination,
             onPageChange: (page) => setPagination((prev) => ({ ...prev, currentPage: page })),
@@ -415,6 +450,13 @@ export function ProductsPage() {
         message={t('products.delete_confirm', 'Are you sure you want to delete this product? This action cannot be undone.')}
         confirmText={t('common.delete', 'Delete')}
         isLoading={isDeleting}
+      />
+
+      {/* Barcode Print Modal - Browser-based printing */}
+      <BarcodePrintModal
+        isOpen={printingProduct !== null}
+        onClose={() => setPrintingProduct(null)}
+        product={printingProduct}
       />
     </div>
   );
