@@ -38,6 +38,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'products.create', 'display_name' => 'Create Products', 'group' => 'products', 'description' => 'Can create new products'],
             ['name' => 'products.update', 'display_name' => 'Update Products', 'group' => 'products', 'description' => 'Can update existing products'],
             ['name' => 'products.delete', 'display_name' => 'Delete Products', 'group' => 'products', 'description' => 'Can delete products'],
+            ['name' => 'products.print', 'display_name' => 'Print Barcodes', 'group' => 'products', 'description' => 'Can print product barcode stickers'],
 
             // Inventory (Phase 2 - placeholder)
             ['name' => 'inventory.view', 'display_name' => 'View Inventory', 'group' => 'inventory', 'description' => 'Can view stock levels'],

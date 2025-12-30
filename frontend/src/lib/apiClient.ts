@@ -99,6 +99,19 @@ export const productsApi = {
     const response = await api.get<ApiResponse<Product>>(`/products/barcode/${barcode}`);
     return response.data.data;
   },
+
+  /**
+   * Print barcode sticker for a product
+   * @param productId - Product ID
+   * @param quantity - Number of stickers to print (default: 1)
+   */
+  printBarcode: async (productId: number, quantity: number = 1): Promise<{ message: string; product: { id: number; name: string; barcode: string }; quantity: number }> => {
+    const response = await api.post<ApiResponse<{ message: string; product: { id: number; name: string; barcode: string }; quantity: number }>>(
+      `/products/${productId}/print-barcode`,
+      { quantity }
+    );
+    return response.data.data;
+  },
 };
 
 // ============================================

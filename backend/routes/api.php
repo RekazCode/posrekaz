@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\LocaleController;
 use App\Http\Controllers\Api\OfflineSyncController;
 use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Api\PrintBarcodeController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseInvoiceController;
 use App\Http\Controllers\Api\PurchaseOrderController;
@@ -129,6 +130,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('permission:products.edit');
     Route::patch('/products/{product}/images/{imageId}/primary', [ProductController::class, 'setPrimaryImage'])
         ->middleware('permission:products.edit');
+    
+    // Barcode printing routes
+    Route::post('/products/{product}/print-barcode', [PrintBarcodeController::class, 'print'])
+        ->middleware('permission:products.print');
+    Route::get('/printer/test', [PrintBarcodeController::class, 'testConnection'])
+        ->middleware('permission:products.print');
+    Route::get('/printer/configuration', [PrintBarcodeController::class, 'configuration'])
+        ->middleware('permission:products.print');
+    
     Route::apiResource('products', ProductController::class);
 
     /*

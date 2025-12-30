@@ -67,6 +67,7 @@ class RoleSeeder extends Seeder
         );
         $warehousePermissions = Permission::whereIn('name', [
             'products.view',
+            'products.print',
             'inventory.view',
             'inventory.adjust',
             'purchases.view',

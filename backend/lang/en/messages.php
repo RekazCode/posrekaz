@@ -245,6 +245,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Printer / Barcode Printing
+    |--------------------------------------------------------------------------
+    */
+    'printer' => [
+        'print_success' => 'Barcode sticker printed successfully',
+        'print_failed' => 'Failed to print barcode sticker: :error',
+        'no_barcode' => 'Product does not have a barcode assigned',
+        'connection_failed' => 'Cannot connect to printer at :path',
+        'network_connection_failed' => 'Cannot connect to printer at :ip::port - :error',
+        'socket_error' => 'Failed to create network socket',
+        'send_failed' => 'Failed to send data to printer',
+        'test_success' => 'Printer connection test successful',
+        'test_failed' => 'Printer connection test failed',
+        'unexpected_error' => 'An unexpected error occurred while printing',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Validation Messages
     |--------------------------------------------------------------------------
     */
