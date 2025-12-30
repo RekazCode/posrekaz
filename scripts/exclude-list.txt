@@ -19,3 +19,7 @@ vendor\*\*\Tests\
 vendor\*\*\.git
 *.md
 !README.md
+public\LPT1
+public\USB006
+LPT1
+USB006
