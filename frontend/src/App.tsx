@@ -18,7 +18,7 @@ const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const RolesPage = lazy(() => import('./pages/RolesPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const AuditPage = lazy(() => import('./pages/AuditPage'));
+// const AuditPage = lazy(() => import('./pages/AuditPage'));
 
 // Suspense fallback for lazy-loaded routes
 function PageLoader() {
@@ -98,7 +98,7 @@ function AppRoutes() {
         <Route path="users" element={<Suspense fallback={<PageLoader />}><UsersPage /></Suspense>} />
         <Route path="roles" element={<Suspense fallback={<PageLoader />}><RolesPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
-        <Route path="audit" element={<Suspense fallback={<PageLoader />}><AuditPage /></Suspense>} />
+        {/* <Route path="audit" element={<Suspense fallback={<PageLoader />}><AuditPage /></Suspense>} /> */}
 
         {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />

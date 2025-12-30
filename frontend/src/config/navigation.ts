@@ -147,14 +147,14 @@ export const navigationConfig: NavSection[] = [
         icon: '⚙️',
         permission: 'settings.view',
       },
-      {
-        id: 'audit',
-        label: 'nav.audit',
-        labelFallback: 'Audit Log',
-        path: '/audit',
-        icon: '📜',
-        permission: 'audit.view',
-      },
+      // {
+      //   id: 'audit',
+      //   label: 'nav.audit',
+      //   labelFallback: 'Audit Log',
+      //   path: '/audit',
+      //   icon: '📜',
+      //   permission: 'audit.view',
+      // },
     ],
   },
 ];
